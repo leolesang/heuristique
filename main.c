@@ -2,11 +2,18 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <time.h>
 
 int n, m;
 int *tab_coef;
 int *tab_m;
 int **tab_m_poid;
+
+typedef struct
+{
+    int index;
+    double ratio;
+} Objet;
 
 void free_tab()
 {
@@ -174,11 +181,175 @@ void print_data()
     }
 }
 
+void print_objet(Objet o[])
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("\nObjet %d:\n", i);
+        printf("InDEX: %d\n", o[i].index);
+        printf("Ratio: %f\n", o[i].ratio);
+    }
+}
+
+int comparer(const void *a, const void *b)
+{
+    Objet *objA = (Objet *)a;
+    Objet *objB = (Objet *)b;
+    return (objB->ratio - objA->ratio > 0) - (objB->ratio - objA->ratio < 0);
+}
+
+void verif_gloutonne(int *selection)
+{
+
+    printf("Objets sélectionnés (indice): ");
+    int profitTotal = 0;
+    for (int j = 0; j < n; j++)
+    {
+        if (selection[j] == 1)
+        {
+            printf("%d ", j);
+            profitTotal += tab_coef[j];
+        }
+    }
+    printf("\n");
+
+    // verif des contraintes et du poids total
+    for (int i = 0; i < m; i++)
+    {
+        int totalPoids = 0;
+        for (int j = 0; j < n; j++)
+        {
+            if (selection[j] == 1)
+            {
+                totalPoids += tab_m_poid[i][j];
+            }
+        }
+        printf("Poids total pour la contrainte %d: %d / %d\n", i, totalPoids, tab_m[i]);
+        if (totalPoids > tab_m[i])
+        {
+            printf("Erreur: probleme de contrainte !\n", i);
+        }
+    }
+
+    printf("Profit total: %d\n", profitTotal);
+}
+
+void gloutonne()
+{
+    Objet objets[n];
+    int *selection = (int *)malloc(n * sizeof(int));
+
+    if (selection == NULL)
+    {
+        printf("Échec de l'allocation mémoire pour selection\n");
+        return;
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        selection[i] = 0;
+    }
+
+    for (int j = 0; j < n; j++)
+    {
+        double totalPoids = 0;
+        for (int i = 0; i < m; i++)
+        {
+            totalPoids += tab_m_poid[i][j];
+        }
+        objets[j].index = j;
+        objets[j].ratio = (double)tab_coef[j] / totalPoids;
+    }
+    qsort(objets, n, sizeof(Objet), comparer);
+
+    for (int j = 0; j < n; j++)
+    {
+        int peutSelectionner = 1;
+        for (int i = 0; i < m; i++)
+        {
+            int totalPoids = 0;
+            for (int k = 0; k < n; k++)
+            {
+                if (selection[k] == 1)
+                {
+                    totalPoids += tab_m_poid[i][k];
+                }
+            }
+            if (totalPoids + tab_m_poid[i][objets[j].index] > tab_m[i])
+            {
+                peutSelectionner = 0; // impossible
+                break;
+            }
+        }
+
+        if (peutSelectionner)
+        {
+            selection[objets[j].index] = 1; // possible
+        }
+    }
+
+    verif_gloutonne(selection);
+    free(selection);
+}
+
+void aleatoire()
+{
+    Objet objets[n];
+    int *selection = (int *)malloc(n * sizeof(int));
+
+    if (selection == NULL)
+    {
+        printf("Échec de l'allocation mémoire pour selection\n");
+        return;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        selection[i] = 0;
+    }
+
+    for (int j = 0; j < n; j++)
+    {
+        int tirage = rand() % 2; // 0 ou 1
+        if (tirage == 1)
+        {
+            int peutSelectionner = 1;
+            for (int i = 0; i < m; i++)
+            {
+                int totalPoids = 0;
+                for (int k = 0; k < n; k++)
+                {
+                    if (selection[k] == 1)
+                    {
+                        totalPoids += tab_m_poid[i][k];
+                    }
+                }
+
+                if (totalPoids + tab_m_poid[i][j] > tab_m[i])
+                {
+                    peutSelectionner = 0;
+                    break;
+                }
+            }
+
+            if (peutSelectionner)
+            {
+                selection[j] = 1;
+            }
+        }
+    }
+
+    verif_gloutonne(selection);
+    free(selection);
+}
+
 int main()
 {
+    srand(time(NULL));
     read_file("Instances_MKP/100M5_1.txt");
     //  read_file("Instances_MKP/500M30_11.txt");
-    print_data();
+    // print_data();
+    gloutonne();
+    aleatoire();
     free_tab();
     return 0;
 }
