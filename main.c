@@ -234,7 +234,7 @@ void verif_gloutonne(int *selection)
     printf("Profit total: %d\n", profitTotal);
 }
 
-void gloutonne()
+void gloutonneV1()
 {
     Objet objets[n];
     int *selection = (int *)malloc(n * sizeof(int));
@@ -287,7 +287,6 @@ void gloutonne()
             selection[objets[j].index] = 1; // possible
         }
     }
-
     verif_gloutonne(selection);
     free(selection);
 }
@@ -306,6 +305,18 @@ void aleatoire()
     {
         selection[i] = 0;
     }
+
+    for (int j = 0; j < n; j++)
+    {
+        double totalPoids = 0;
+        for (int i = 0; i < m; i++)
+        {
+            totalPoids += tab_m_poid[i][j];
+        }
+        objets[j].index = j;
+        objets[j].ratio = (double)tab_coef[j] / totalPoids;
+    }
+    qsort(objets, n, sizeof(Objet), comparer);
 
     for (int j = 0; j < n; j++)
     {
@@ -337,7 +348,6 @@ void aleatoire()
             }
         }
     }
-
     verif_gloutonne(selection);
     free(selection);
 }
@@ -345,10 +355,10 @@ void aleatoire()
 int main()
 {
     srand(time(NULL));
-    read_file("Instances_MKP/100M5_1.txt");
+    read_file("Instances_MKP/100M5_21.txt");
     //  read_file("Instances_MKP/500M30_11.txt");
     // print_data();
-    gloutonne();
+    gloutonneV1();
     aleatoire();
     free_tab();
     return 0;
