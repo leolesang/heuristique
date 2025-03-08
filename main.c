@@ -442,7 +442,6 @@ int main(int argc, char *argv[])
     char input_file[50];
     double exec_time = 0;
     char output_file[50];
-    int stdout_copy;
     FILE *output;
 
     argGestion(argc, argv, input_file, &exec_time, output_file);
