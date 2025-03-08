@@ -3,12 +3,13 @@
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 int n, m;
 int *tab_coef;
 int *tab_m;
 int **tab_m_poid;
-
+int stdout_copy;
 typedef struct
 {
     int index;
@@ -27,6 +28,66 @@ void free_tab()
             free(tab_m_poid[i]);
         }
         free(tab_m_poid);
+    }
+}
+
+// Fonction pour afficher l'aide
+void printHelp()
+{
+    printf("Utilisation : a.exe [input_file] [exec_time] [output_file]\n");
+    printf("Arguments (optionnels) :\n");
+    printf("  input_file :      Chemin vers le fichier d'entrée (par défaut : Instances_MKP/100M5_1.txt)\n");
+    printf("  exec_time :       Temps en secondes (par défaut : 30)\n");
+    printf("  output_file :     Chemin vers le fichier de sortie (par défaut : aucun, sortie standard)\n");
+}
+
+// Fonction pour gérer les arguments
+void argGestion(int argc, char *argv[], char *input_file, double *exec_time, char *output_file)
+{
+    char *endptr;
+
+    printf("argc = %d\n", argc);
+    printf("argv[1] = %s\n", argv[1]);
+    printf("argv[2] = %s\n", argv[2]);
+    printf("argv[3] = %s\n", argv[3]);
+
+    switch(argc){
+        case 1:
+            strcpy(input_file, "Instances_MKP/100M5_1.txt");
+            *exec_time = 30;
+            strcpy(output_file, ""); // Pas de fichier de sortie
+            break;
+        case 2:
+            strncpy(input_file, argv[1], strlen(argv[1]));
+            *exec_time = 30;
+            strcpy(output_file, ""); // Pas de fichier de sortie
+            break;
+        case 3:       
+            strncpy(input_file, argv[1], strlen(argv[1]));
+            // Vérification et assignation de exec_time
+            *exec_time = strtod(argv[2], &endptr);
+            if (endptr == argv[2] || *endptr != '\0' || exec_time <= 0) {
+                printf("Erreur : L'argument 'exec_time' doit être un nombre positif.\n");
+                printHelp();
+                return;
+            }
+            strcpy(output_file, ""); // Pas de fichier de sortie
+            break;
+        case 4:
+            strncpy(input_file, argv[1], strlen(argv[1]));
+            // Vérification et assignation de exec_time
+            *exec_time = strtod(argv[2], &endptr);
+            if (endptr == argv[2] || *endptr != '\0' || exec_time <= 0) {
+                printf("Erreur : L'argument 'exec_time' doit être un nombre positif.\n");
+                printHelp();
+                return;
+            }
+            strncpy(output_file, argv[3], strlen(argv[3]));
+            break;
+        default:
+            printf("Erreur : Nombre incorrect d'arguments.\n");
+            printHelp();
+            return;
     }
 }
 
@@ -80,12 +141,23 @@ void insert_tab(char *myString, int count, int *tab)
     }
 }
 
+FILE *write_file(char *file)
+{
+    FILE *fptr = fopen(file, "a");
+    if (!fptr)
+    {
+        printf("Impossible d'ouvrir le fichier \"%s\". Veuillez vérifier que ce dernier existe\n", file);
+        return NULL;
+    }
+    return fptr;
+}
+
 void read_file(char *file)
 {
     FILE *fptr = fopen(file, "r");
     if (!fptr)
     {
-        printf("Impossible d'ouvrir le fichier.\n");
+        printf("Impossible d'ouvrir le fichier \"%s\". Veuillez vérifier que ce dernier existe\n", file);
         return;
     }
 
@@ -352,14 +424,60 @@ void aleatoire()
     free(selection);
 }
 
-int main()
+void redirect_stdout_to_file(char *file)
 {
+    stdout_copy = dup(STDOUT_FILENO); // Sauvegarder stdout
+    freopen(file, "a", stdout);
+}
+
+void restore_stdout()
+{
+    fflush(stdout); // Vider le buffer de sortie
+    dup2(stdout_copy, STDOUT_FILENO); // Restaurer stdout
+    close(stdout_copy); // Fermer le descripteur de fichier sauvegardé
+}
+
+int main(int argc, char *argv[])
+{   
+    char input_file[50];
+    double exec_time = 0;
+    char output_file[50];
+    int stdout_copy;
+    FILE *output;
+
+    argGestion(argc, argv, input_file, &exec_time, output_file);
+
+    // Affichage des valeurs assignées
+    printf("Fichier d'entrée : %s\n", input_file);
+    printf("Temps : %.2f secondes\n", exec_time);
+    if (strlen(output_file) > 0)
+    {
+        output = write_file(output_file); // Ouvrir le fichier de sortie
+        fprintf(output, "Fichier d'entrée : %s\n", input_file);
+        fprintf(output, "Temps : %.2f secondes\n", exec_time);
+        printf("Fichier de sortie : %s\n", output_file);
+        fclose(output); // Fermer le fichier
+        redirect_stdout_to_file(output_file); // Rediriger stdout vers le fichier de sortie
+    }
+
     srand(time(NULL));
-    read_file("Instances_MKP/100M5_21.txt");
+    read_file(input_file);
     //  read_file("Instances_MKP/500M30_11.txt");
     // print_data();
     gloutonneV1();
     aleatoire();
     free_tab();
+
+    if (strlen(output_file) > 0)
+    {
+        output = write_file(output_file); // Ouvrir le fichier de sortie
+        restore_stdout(); // Restaurer stdout pour écrire dans la console
+        printf("Les résultats ont été enregistrés dans le fichier \"%s\"\n", output_file);
+        fprintf(output, "Exécution terminée.\n");
+        fclose(output); // Fermer le fichier
+    }
+
+    printf("Exécution terminée.\n");
+
     return 0;
 }
