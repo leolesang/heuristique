@@ -10,6 +10,7 @@ int *tab_coef;
 int *tab_m;
 int **tab_m_poid;
 int stdout_copy;
+int best_profit = 0; // Variable pour stocker le meilleur profit
 typedef struct
 {
     int index;
@@ -258,7 +259,7 @@ void print_objet(Objet o[])
     for (int i = 0; i < n; i++)
     {
         printf("\nObjet %d:\n", i);
-        printf("InDEX: %d\n", o[i].index);
+        printf("INDEX: %d\n", o[i].index);
         printf("Ratio: %f\n", o[i].ratio);
     }
 }
@@ -304,6 +305,12 @@ void verif_gloutonne(int *selection)
     }
 
     printf("Profit total: %d\n", profitTotal);
+
+    // Mettre à jour le meilleur profit
+    if (profitTotal > best_profit)
+    {
+        best_profit = profitTotal;
+    }
 }
 
 void gloutonneV1()
@@ -443,40 +450,73 @@ int main(int argc, char *argv[])
     double exec_time = 0;
     char output_file[50];
     FILE *output;
+    double final_exec_time;
 
     argGestion(argc, argv, input_file, &exec_time, output_file);
 
     // Affichage des valeurs assignées
+    printf("******************\n");
     printf("Fichier d'entrée : %s\n", input_file);
     printf("Temps : %.2f secondes\n", exec_time);
     if (strlen(output_file) > 0)
     {
         output = write_file(output_file); // Ouvrir le fichier de sortie
+        fprintf(output, "******************\n");
         fprintf(output, "Fichier d'entrée : %s\n", input_file);
         fprintf(output, "Temps : %.2f secondes\n", exec_time);
+        fprintf(output, "******************\n\n");
         printf("Fichier de sortie : %s\n", output_file);
+        printf("******************\n\n");
+        printf("Ecriture des résultats dans le fichier de sortie...\n");
         fclose(output); // Fermer le fichier
         redirect_stdout_to_file(output_file); // Rediriger stdout vers le fichier de sortie
     }
+    else
+    {
+        printf("******************\n\n");
+    }
+    
 
     srand(time(NULL));
     read_file(input_file);
     //  read_file("Instances_MKP/500M30_11.txt");
     // print_data();
-    gloutonneV1();
-    aleatoire();
+
+    // Mesurer le temps d'exécution
+    clock_t start_time = clock();
+
+    // Exécuter les algorithmes
+    while ((double)(clock() - start_time) / CLOCKS_PER_SEC < exec_time)
+    {
+        gloutonneV1();
+        aleatoire();
+    }
+
+    final_exec_time = (double)(clock() - start_time) / CLOCKS_PER_SEC;
     free_tab();
 
     if (strlen(output_file) > 0)
     {
         output = write_file(output_file); // Ouvrir le fichier de sortie
         restore_stdout(); // Restaurer stdout pour écrire dans la console
+        printf("\n******************\n");
+        printf("Exécution terminée !\n");
         printf("Les résultats ont été enregistrés dans le fichier \"%s\"\n", output_file);
-        fprintf(output, "Exécution terminée.\n");
+        fprintf(output, "\n******************\n");
+        fprintf(output, "Exécution terminée !\n");
+        fprintf(output, "Temps d'exécution : %.2f secondes\n", final_exec_time);
+        fprintf(output, "Meilleur profit total : %d\n", best_profit);
+        fprintf(output, "******************\n");
         fclose(output); // Fermer le fichier
     }
-
-    printf("Exécution terminée.\n");
+    else
+    {
+        printf("\n******************\n");
+        printf("Exécution terminée !\n");
+    }
+    printf("Temps d'exécution : %.2f secondes\n", final_exec_time);
+    printf("Meilleur profit total : %d\n", best_profit);
+    printf("******************\n");
 
     return 0;
 }
