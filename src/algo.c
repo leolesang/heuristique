@@ -354,7 +354,17 @@ void vnd(int *solution, double temps_max)
       double elapsed_time = (double)(clock() - start_time) / CLOCKS_PER_SEC;
       if (elapsed_time >= temps_max)
       {
-        printf("VND : Temps limite atteint (%.2f s), stop.\n", elapsed_time);
+        printf("VND : Temps limite atteint (%.2f s), arrêt.\n", elapsed_time);
+        printf("Meilleur profit : %d\n", best_profit);
+        printf("Meilleure solution : ");
+        for (int i = 0; i < n; i++)
+        {
+          if (best_solution[i] == 1)
+          {
+            printf("%d ", i);
+          }
+        }
+        printf("\n");
         break;
       }
     }
@@ -441,6 +451,16 @@ void vns(int *solution, double temps_max)
     if (elapsed_time >= temps_max)
     {
       printf("VNS : Temps limite atteint (%.2f s), arrêt.\n", elapsed_time);
+      printf("Meilleur profit : %d\n", best_profit);
+      printf("Meilleure solution : ");
+      for (int i = 0; i < n; i++)
+      {
+        if (best_solution[i] == 1)
+        {
+          printf("%d ", i);
+        }
+      }
+      printf("\n");
       break;
     }
 

@@ -40,6 +40,7 @@ void write_data(char *file, int *solution)
   file_name_copy[255] = '\0';
 
   snprintf(file, 512, "%s_%d.txt", file_name_copy, profit);
+  printf("(Les résultats ont été écrits dans le fichier \"%s\")\n", file);
 
   FILE *fptr = fopen(file, "w");
   if (fptr == NULL)
