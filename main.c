@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <signal.h>
 
 int n, m;
 int *tab_coef;
@@ -11,6 +12,9 @@ int *tab_m;
 int **tab_m_poid;
 int stdout_copy;
 int best_profit = 0; // Variable pour stocker le meilleur profit
+volatile sig_atomic_t stop_program = 0; // Variable pour indiquer l'arrêt du programme
+char output_file[50];
+clock_t start_time = 0;
 typedef struct
 {
     int index;
@@ -444,15 +448,48 @@ void restore_stdout()
     close(stdout_copy); // Fermer le descripteur de fichier sauvegardé
 }
 
+void signal_handler(int signum)
+{
+    stop_program = 1;
+    printf("\nArrêt du programme demandé. Nettoyage des ressources...\n");
+    free_tab();
+    if (stdout_copy != 0)
+    {
+        restore_stdout();
+    }
+    if (strlen(output_file) > 0)
+    {
+        FILE *output = write_file(output_file);
+        if (output)
+        {
+            fprintf(output, "\n******************\n");
+            fprintf(output, "Exécution interrompue !\n");
+            fprintf(output, "Temps d'exécution : %.2f secondes\n", (double)(clock() - start_time) / CLOCKS_PER_SEC);
+            fprintf(output, "Meilleur profit total : %d\n", best_profit);
+            fprintf(output, "******************\n");
+            fclose(output);
+        }
+    }
+    printf("\n******************\n");
+    printf("Exécution interrompue !\n");
+    printf("Temps d'exécution : %.2f secondes\n", (double)(clock() - start_time) / CLOCKS_PER_SEC);
+    printf("Meilleur profit total : %d\n", best_profit);
+    printf("******************\n");
+    exit(signum);
+}
+
 int main(int argc, char *argv[])
 {   
     char input_file[50];
     double exec_time = 0;
-    char output_file[50];
     FILE *output;
     double final_exec_time;
 
     argGestion(argc, argv, input_file, &exec_time, output_file);
+
+    // Installer le gestionnaire de signaux
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
 
     // Affichage des valeurs assignées
     printf("******************\n");
@@ -483,10 +520,10 @@ int main(int argc, char *argv[])
     // print_data();
 
     // Mesurer le temps d'exécution
-    clock_t start_time = clock();
+    start_time = clock();
 
     // Exécuter les algorithmes
-    while ((double)(clock() - start_time) / CLOCKS_PER_SEC < exec_time)
+    while (!stop_program && (double)(clock() - start_time) / CLOCKS_PER_SEC < exec_time)
     {
         gloutonneV1();
         aleatoire();
