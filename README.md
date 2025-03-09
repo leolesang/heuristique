@@ -1,12 +1,12 @@
 # **Heuristique**
 
-Le but de se projet est de trouver la meilleur solution sur le problème SADM.
+Le but de ce projet est de trouver la meilleure solution sur le problème SADM.
 
 ## **📦 Installation**
 
 ### Étapes d'installation
 
-1. Clone le projet :
+1. Cloner le projet :
 
 ```bash
 git clone https://github.com/leolesang/heuristique.git
