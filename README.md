@@ -18,9 +18,13 @@ cd heuristique
 ```bash
 make
 ```
-
+### Windows
 ```bash
 .\heuristique [Instance] [Temps] [Algo (VNS|VND)]
+```
+### Linux
+```bash
+./heuristique [Instance] [Temps] [Algo (VNS|VND)]
 ```
 
 ## **📂 Structure du Projet**
@@ -28,7 +32,7 @@ make
 ```
 heuristique/
 ├──  Instance_MKP # Dossier des fichiers instances  
-├──  resultat # Dossier des résultats  
+├──  resultats # Dossier des résultats  
 ├──  src # Dossier du programme  
 └── README.md       
 └── Makefile        

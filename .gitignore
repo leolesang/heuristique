@@ -1,2 +1,5 @@
 /*.txt
 *.exe
+src/*.o
+resultats/*
+heuristique*

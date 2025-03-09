@@ -83,7 +83,7 @@ void argGestion(int argc, char *argv[], char *input_file, int *exec_time, char *
   tm_info = *tm_ptr;
 #endif
 
-  snprintf(output_file, 255, "resultat/%s_%s_%04d_%02d_%02d_%02dh_%02dm_%02ds",
+  snprintf(output_file, 255, "resultats/%s_%s_%04d_%02d_%02d_%02dh_%02dm_%02ds",
            algo,
            file_name_copy,
            tm_info.tm_year + 1900, tm_info.tm_mon + 1, tm_info.tm_mday,
@@ -544,7 +544,7 @@ void gloutonneV1(char *output_file, char *algo, int exec_time)
   }
   if (!(verif_gloutonne(solution)))
   {
-    printf("Erreur de contrainte dans le sac à dos la gloutonne n'est pas bonne !");
+    printf("Erreur de contrainte dans le sac à dos : la gloutonne n'est pas bonne !");
     return;
   }
 
@@ -558,13 +558,13 @@ void gloutonneV1(char *output_file, char *algo, int exec_time)
   }
   else
   {
-    printf("Algorithme Inconnu erreur \n");
+    printf("ERREUR : Algorithme Inconnu\n");
     return;
   }
 
   if (!(verif_gloutonne(solution)))
   {
-    printf("Erreur de contrainte dans le sac à dos la gloutonne n'est pas bonne !");
+    printf("Erreur de contrainte dans le sac à dos : la gloutonne n'est pas bonne !");
     return;
   }
   write_data(output_file, solution);
@@ -645,13 +645,13 @@ void aleatoire()
   }
   if (!(verif_gloutonne(solution)))
   {
-    printf("Erreur de contrainte dans le sac à dos la solution n'est pas bonne !");
+    printf("Erreur de contrainte dans le sac à dos : la solution n'est pas bonne !");
     return;
   }
   vns(solution, 20);
   if (!(verif_gloutonne(solution)))
   {
-    printf("Erreur de contrainte dans le sac à dos la solution n'est pas bonne !");
+    printf("Erreur de contrainte dans le sac à dos : la solution n'est pas bonne !");
     return;
   }
   write_data("result.txt", solution);
