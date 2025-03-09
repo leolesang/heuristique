@@ -39,7 +39,7 @@ void write_data(char *file, int *solution)
   strncpy(file_name_copy, file, 255);
   file_name_copy[255] = '\0';
 
-  snprintf(file, 255, "%s_%d.txt", file_name_copy, profit);
+  snprintf(file, 512, "%s_%d.txt", file_name_copy, profit);
 
   FILE *fptr = fopen(file, "w");
   if (fptr == NULL)

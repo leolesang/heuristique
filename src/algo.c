@@ -83,7 +83,7 @@ void argGestion(int argc, char *argv[], char *input_file, int *exec_time, char *
   tm_info = *tm_ptr;
 #endif
 
-  snprintf(output_file, 255, "resultats/%s_%s_%04d_%02d_%02d_%02dh_%02dm_%02ds",
+  snprintf(output_file, 512, "resultats/%s_%s_%04d_%02d_%02d_%02dh_%02dm_%02ds",
            algo,
            file_name_copy,
            tm_info.tm_year + 1900, tm_info.tm_mon + 1, tm_info.tm_mday,
