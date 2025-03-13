@@ -32,8 +32,11 @@ int main(int argc, char *argv[])
     {
         exit(EXIT_FAILURE);
     }
-
-    gloutonneV1(output_file, algo, exec_time);
+    if (strcmp(algo, "STAT") == 0) {
+        gloutonneV1(input_file, algo, exec_time);
+    } else {
+        gloutonneV1(output_file, algo, exec_time);
+    }
 
     // aleatoire();
     // test("../Instances_MKP/100M5_1.txt","result.txt");

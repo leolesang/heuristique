@@ -3,3 +3,4 @@
 src/*.o
 resultats/*.txt
 heuristique*
+.vscode

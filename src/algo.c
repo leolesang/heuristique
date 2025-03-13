@@ -90,6 +90,14 @@ void argGestion(int argc, char *argv[], char *input_file, int *exec_time, char *
            tm_info.tm_hour, tm_info.tm_min, tm_info.tm_sec);
 }
 
+int* copier_solution(int* solution, int n) {
+  int* copie = malloc(n * sizeof(int));
+  if (!copie) { perror("malloc failed"); exit(EXIT_FAILURE); }
+  memcpy(copie, solution, n * sizeof(int));
+  return copie;
+}
+
+
 /*
  * Fonction : calculer_profit
  * ----------------
@@ -575,6 +583,45 @@ void gloutonneV1(char *output_file, char *algo, int exec_time)
   else if (strcmp(algo, "VND") == 0)
   {
     vnd(solution, exec_time);
+  }
+  else if (strcmp(algo, "STAT") == 0)
+  {
+    char* data_file = "./stat/data.txt";
+ 
+    FILE* file = fopen(data_file, "a");
+    if (!file) {
+        perror("Erreur ouverture fichier");
+        return;
+    }
+
+    fprintf(file, "%d ", calculer_profit(solution));
+
+    int* sol1 = copier_solution(solution, n);
+    ls_1flip(sol1);
+    fprintf(file, "%d ", calculer_profit(sol1));
+    free(sol1);
+
+    int* sol2 = copier_solution(solution, n);
+    ls_echange(sol2);
+    fprintf(file, "%d ", calculer_profit(sol2));
+    free(sol2);
+
+    int* sol3 = copier_solution(solution, n);
+    vnd(sol3, exec_time);
+    fprintf(file, "%d ", calculer_profit(sol3));
+    free(sol3);
+
+    int* sol4 = copier_solution(solution, n);
+    vns(sol4, exec_time);
+    fprintf(file, "%d ", calculer_profit(sol4));
+    free(sol4);
+    
+    fprintf(file, "%d ", exec_time);
+    fprintf(file, "%s\n", output_file);
+
+    fclose(file);
+    free(solution);
+    return;
   }
   else
   {
