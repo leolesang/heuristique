@@ -25,7 +25,7 @@ fichiers_instances = [f for f in os.listdir(instances_dir) if f != "valeurs_refe
 
 for fichier in fichiers_instances:
     chemin_fichier = os.path.join(instances_dir, fichier)
-    executer_heuristique(chemin_fichier, 20)
-    executer_heuristique(chemin_fichier, 40)
+    executer_heuristique(chemin_fichier, 5)
+    executer_heuristique(chemin_fichier, 10)
 
 print("Toutes les commandes ont été exécutées.")
